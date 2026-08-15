@@ -1,1 +1,195 @@
-hello
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Gift Cheat Catalog Prototype</title>
+<style>
+:root{
+  --ink:#382f36; --paper:#fffdf8; --pink:#ffcfda; --pink2:#ffe8ef; --mint:#cfeee8; --yellow:#ffe79a; --blue:#cfe1ff; --red:#ee6b79; --green:#57a897; --shadow:0 12px 30px rgba(63,42,54,.13);
+}
+*{box-sizing:border-box} body{margin:0;background:#f7f0e9;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",sans-serif;overflow:hidden}
+button,input{font:inherit;color:inherit}
+#app{height:100dvh;max-width:520px;margin:auto;background:linear-gradient(180deg,#fff8f4,#f8f2ea);position:relative;overflow:hidden;border-inline:1px solid rgba(0,0,0,.04)}
+.screen{position:absolute;inset:0;display:none;flex-direction:column}.screen.active{display:flex}
+.topbar{height:58px;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px dashed #d9c8c1;background:rgba(255,253,248,.92);backdrop-filter:blur(8px);z-index:5}
+.logo{font-weight:900;letter-spacing:.02em}.mini{font-size:12px;opacity:.66}
+.btn{border:0;border-radius:16px;padding:12px 16px;font-weight:800;box-shadow:0 4px 0 rgba(56,47,54,.13);background:white}.btn:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(56,47,54,.13)}
+.btn.primary{background:var(--ink);color:white}.btn.pink{background:var(--pink)} .btn.soft{background:#fff;border:1px solid #e4d7d0}
+.hero{padding:26px 22px 12px}.hero h1{font-size:30px;line-height:1.15;margin:6px 0 10px;font-weight:950}.hero p{line-height:1.75;margin:0;color:#66585f}
+.sticker{display:inline-block;padding:6px 10px;border-radius:999px;background:var(--yellow);font-size:12px;font-weight:900;transform:rotate(-2deg);box-shadow:0 3px 0 #e5cf7a}
+.start-card{margin:14px 18px;background:var(--paper);border:2px solid var(--ink);border-radius:24px;padding:18px;box-shadow:var(--shadow);position:relative}.start-card:after{content:"♡";position:absolute;right:14px;top:-15px;font-size:34px;color:var(--red);transform:rotate(10deg)}
+.label{font-size:12px;font-weight:900;opacity:.65;margin-bottom:6px}.name-input{width:100%;border:0;border-bottom:3px solid var(--ink);font-size:22px;font-weight:900;padding:8px 2px;background:transparent;outline:none}
+.start-actions{padding:0 18px 24px;margin-top:auto;display:grid;gap:10px}
+
+/* interview */
+.workspace{flex:1;min-height:0;display:grid;grid-template-rows:188px 1fr;background:linear-gradient(#f5eadf 0 188px,#fffaf5 188px)}
+.desk{position:relative;padding:12px 14px 8px;border-bottom:1px solid #dacabd;background:linear-gradient(180deg,#ead7c8,#e4cfbe)}
+.desk:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 28px,rgba(90,55,38,.025) 29px 30px);pointer-events:none}
+.profile-sheet{position:absolute;left:14px;top:12px;width:68%;height:158px;background:#fffdf8;border:2px solid var(--ink);border-radius:14px;padding:10px 12px;box-shadow:0 7px 0 rgba(92,64,53,.14);transform:rotate(-1deg);overflow:hidden}
+.profile-title{display:flex;align-items:center;gap:8px;font-weight:950}.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}.profile-cell{min-height:47px;padding:6px 7px;background:#fff;border:1.5px dashed #d7c8bf;border-radius:10px;font-size:11px}.profile-cell b{display:block;font-size:10px;margin-bottom:2px}.profile-cell.new{animation:pop .42s ease;background:#fff4c8}@keyframes pop{0%{transform:scale(.8);opacity:.2}70%{transform:scale(1.05)}100%{transform:scale(1)}}
+.paper-stack{position:absolute;right:16px;bottom:13px;width:88px;height:92px;cursor:pointer}.paper{position:absolute;width:74px;height:83px;border:1.5px solid var(--ink);border-radius:7px;background:#fffdf8;box-shadow:0 4px 8px rgba(70,48,44,.12);left:7px;bottom:0;transition:.35s}.paper-stack .paper:nth-child(3n){background:#fff5d6}.paper-stack .paper:nth-child(3n+1){background:#fcebf1}.paper-stack .paper:nth-child(3n+2){background:#eaf6f3}
+.stack-label{position:absolute;right:4px;top:-6px;background:var(--pink);padding:5px 7px;border-radius:9px;border:1.5px solid var(--ink);font-size:10px;font-weight:900;transform:rotate(3deg);z-index:15}
+.chat{min-height:0;display:flex;flex-direction:column}.messages{flex:1;overflow:auto;padding:14px 14px 90px;scroll-behavior:smooth}.bubble{max-width:86%;padding:11px 13px;border-radius:17px;margin:7px 0;line-height:1.5;font-size:14px;box-shadow:0 3px 0 rgba(56,47,54,.08)}.bubble.ai{background:white;border:1px solid #eadfd9;border-bottom-left-radius:5px}.bubble.me{margin-left:auto;background:var(--mint);border-bottom-right-radius:5px}.typing{opacity:.6;font-size:12px;margin:8px 4px}
+.composer{position:absolute;left:0;right:0;bottom:0;padding:9px 10px calc(9px + env(safe-area-inset-bottom));display:grid;grid-template-columns:1fr auto;gap:8px;background:rgba(255,250,245,.96);border-top:1px solid #e8dad3;backdrop-filter:blur(8px)}
+.composer input{border:1.5px solid #d9cac3;border-radius:18px;padding:12px 13px;outline:none;background:white}.send{width:46px;border-radius:50%;border:0;background:var(--ink);color:white;font-weight:900}
+.cheat{position:absolute;right:12px;bottom:74px;z-index:7;border:2px solid var(--ink);background:var(--yellow);border-radius:18px;padding:9px 11px;font-size:11px;font-weight:950;transform:rotate(1.5deg);box-shadow:0 5px 0 rgba(56,47,54,.14)}
+.cheat small{display:block;font-size:9px;font-weight:700}
+
+/* overlays */
+.overlay{position:absolute;inset:0;background:rgba(48,38,43,.33);display:none;align-items:center;justify-content:center;padding:20px;z-index:50}.overlay.show{display:flex}
+.lifted-note{width:88%;min-height:62%;background:#fffdf7;border:2px solid var(--ink);border-radius:10px;padding:22px 18px;box-shadow:0 24px 60px rgba(43,31,36,.3);transform:rotate(-1.2deg);position:relative;animation:lift .25s ease}@keyframes lift{from{transform:translateY(35px) rotate(-3deg);opacity:.3}}
+.hand{font-family:"Hiragino Maru Gothic ProN","Yu Gothic",sans-serif;font-size:18px;line-height:1.8}.note-num{font-size:11px;opacity:.55;margin-bottom:14px}.swipe-hint{text-align:center;font-size:11px;opacity:.55;margin-top:22px}.corner-tape{position:absolute;width:72px;height:22px;background:rgba(255,222,141,.72);top:-8px;left:50%;transform:translateX(-50%) rotate(2deg)}
+.modal-card{width:92%;background:#fffdf8;border:2px solid var(--ink);border-radius:24px;padding:18px;box-shadow:var(--shadow)}.modal-card h2{margin:0 0 8px}.modal-card p{line-height:1.6;font-size:14px}.choices{display:grid;gap:8px;margin-top:14px}
+
+/* catalog */
+.catalog-head{padding:14px 14px 10px;background:#fff8f3;border-bottom:1px dashed #ddcec5}.catalog-head h2{margin:4px 0 2px;font-size:23px}.catalog-head .sub{font-size:12px;opacity:.64}
+.catalog-track{flex:1;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;background:#f7efe7}.catalog-track::-webkit-scrollbar{display:none}
+.page{min-width:100%;scroll-snap-align:start;padding:14px 14px 86px;overflow-y:auto}.mag{background:#fffdf9;border:2px solid var(--ink);border-radius:20px;min-height:100%;padding:14px;box-shadow:var(--shadow);position:relative;overflow:hidden}.mag.pick{background:linear-gradient(135deg,#fffdf9 0 63%,#fff3ba 63%)}
+.mag .tag{display:inline-block;background:var(--red);color:white;padding:5px 9px;border-radius:999px;font-size:10px;font-weight:900;transform:rotate(-2deg)}.product-visual{height:178px;border-radius:16px;margin:10px 0;background:linear-gradient(135deg,#f6d7df,#d9efea);display:grid;place-items:center;font-size:72px;border:1.5px solid rgba(56,47,54,.35);position:relative;overflow:hidden}.product-visual:after{content:"使用イメージ";position:absolute;right:8px;bottom:8px;background:#fff;padding:4px 7px;border-radius:8px;font-size:9px;font-weight:900}
+.prod-title{font-size:20px;font-weight:950;line-height:1.25}.price{font-size:13px;font-weight:900;margin-top:3px}.edit-note{background:white;border-left:5px solid var(--pink);padding:9px 10px;margin:10px 0;border-radius:8px;font-size:12px;line-height:1.6}
+.radar-wrap{display:grid;grid-template-columns:128px 1fr;gap:10px;align-items:center;margin-top:8px}.radar{width:126px;height:126px}.axes{display:grid;gap:5px}.axis-line{font-size:10px;display:flex;justify-content:space-between;gap:8px}.axis-line b{font-size:10px}.dots{letter-spacing:1px;font-size:10px}
+.page-count{position:absolute;right:15px;bottom:70px;z-index:5;background:#fff;border:1.5px solid var(--ink);border-radius:999px;padding:6px 9px;font-size:10px;font-weight:900}
+.catalog-actions{position:absolute;left:0;right:0;bottom:0;padding:9px 10px calc(9px + env(safe-area-inset-bottom));display:grid;grid-template-columns:1fr 1fr;gap:8px;background:rgba(255,250,245,.95);border-top:1px solid #e2d6cf;z-index:8}
+
+/* wrap */
+.wrap-grid{padding:16px;display:grid;gap:14px;overflow:auto}.wrap-option{border:2px solid var(--ink);border-radius:20px;padding:12px;background:#fff;box-shadow:0 5px 0 rgba(56,47,54,.1);display:grid;grid-template-columns:110px 1fr;gap:12px;align-items:center}.wrap-option.selected{outline:4px solid var(--pink)}
+.bag{height:105px;border-radius:12px;position:relative;display:grid;place-items:center;font-size:28px;font-weight:950;border:1.5px solid var(--ink)}.bag:before{content:"";position:absolute;top:-11px;width:64px;height:24px;border:4px solid var(--ink);border-bottom:0;border-radius:40px 40px 0 0}.ribbon{position:absolute;width:18px;height:100%;background:#f26f84;left:47%;top:0}.ribbon:after{content:"🎀";position:absolute;top:34px;left:-14px;font-size:36px}.wrap-option:nth-child(1) .bag{background:#ffd6df}.wrap-option:nth-child(2) .bag{background:#d9efe9}.wrap-option:nth-child(3) .bag{background:#f9e8a9}
+.receiver-card{margin:18px;background:white;border:2px solid var(--ink);border-radius:24px;padding:18px;box-shadow:var(--shadow)}
+.toast{position:absolute;left:50%;bottom:92px;transform:translateX(-50%) translateY(20px);opacity:0;background:var(--ink);color:white;padding:10px 13px;border-radius:999px;font-size:11px;font-weight:800;z-index:100;transition:.25s;white-space:nowrap}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* no-JS fallback for ChatGPT iOS preview */
+.screen{display:none}
+#start{display:flex}
+.screen:target{display:flex}
+body:has(.screen:target) #start{display:none}
+a.btn{text-decoration:none;text-align:center}
+</style>
+</head>
+<body>
+<div id="app">
+  <section id="start" class="screen active">
+    <div class="hero">
+      <span class="sticker">🎁 gift research club</span>
+      <h1>あの人のための<br>プレゼント探し。</h1>
+      <p>AIとおしゃべりしながら、相手のことを思い出していこう。最後に、あなただけの小さなギフト雑誌をつくります。</p>
+    </div>
+    <div class="start-card">
+      <div class="label">今日は誰のプレゼント？</div>
+      <input id="personName" class="name-input" value="みさき" aria-label="相手の名前" />
+      <p class="mini">名前はあとから変えられます。</p>
+    </div>
+    <div class="start-actions"><button id="startInterviewBtn" class="btn primary" type="button">プロフィール取材をはじめる →</button></div>
+  </section>
+
+  <section id="interview" class="screen">
+    <div class="topbar"><div><div class="logo">PROFILE INTERVIEW ✎</div><div class="mini" id="interviewFor"></div></div><button class="btn soft" style="padding:8px 10px" onclick="finishInterview(true)">もう探す</button></div>
+    <div class="workspace">
+      <div class="desk">
+        <div class="profile-sheet">
+          <div class="profile-title"><span>♡</span><span id="profileTitle">みさき PROFILE</span></div>
+          <div id="profileGrid" class="profile-grid"><div class="profile-cell"><b>好き</b>カフェ・雑貨</div><div class="profile-cell"><b>最近</b>部屋づくり</div><div class="profile-cell"><b>生活</b>大学・一人暮らし</div><div class="profile-cell"><b>避けたい</b>大きすぎる物</div></div>
+        </div>
+        <div id="paperStack" class="paper-stack" onclick="openNotes()"><div class="stack-label"><span id="stackCount">0</span> notes</div></div>
+      </div>
+      <div class="chat"><div id="messages" class="messages"></div></div>
+    </div>
+    <button class="cheat" onclick="openCheat('profile')">いや…流石に<br>カンニングしちゃうか…w<small>本人にちょっと聞く 👀</small></button>
+    <div class="composer"><input id="chatInput" placeholder="思いつくまま話してOK" onkeydown="if(event.key==='Enter')sendChat()"><button class="send" onclick="sendChat()">↑</button></div>
+  </section>
+
+  <section id="catalog" class="screen">
+    <div class="topbar"><div><div class="logo">FOR <span id="catalogName">MISAKI</span></div><div class="mini">your private gift catalogue</div></div><button class="btn soft" style="padding:8px 10px" onclick="go('interview')">←取材</button></div>
+    <div class="catalog-head"><span class="sticker">編集部 PICK UP 4</span><h2>15 gifts, just for you.</h2><div class="sub">横にスワイプして、形の違いを見比べてみよう。</div></div>
+    <div id="catalogTrack" class="catalog-track"><div class="page"><div class="mag pick"><span class="tag">PICK UP 1</span><div class="product-visual">🌷</div><div class="prod-title">小さな花瓶</div><div class="price price-field">¥3,980 <span class="mini">くらい</span></div><div class="edit-note">部屋に少しだけ色を足せる。自分では後回しにしがちなもの。</div><div class="radar-wrap"><div class="radar"><svg viewBox="0 0 120 120"><polygon points="60,13 105,45 88,99 32,99 15,45" fill="none" stroke="#d7cbc5"/><polygon points="60,22 94,49 82,88 39,92 23,47" fill="rgba(238,107,121,.24)" stroke="#382f36" stroke-width="2"/></svg></div><div class="axes"><div class="axis-line"><b>その人らしさ</b><span>●●●●○</span></div><div class="axis-line"><b>あなたから贈る意味</b><span>●●●●●</span></div><div class="axis-line"><b>使いやすさ</b><span>●●●○○</span></div><div class="axis-line"><b>意外性</b><span>●●●●○</span></div><div class="axis-line"><b>特別感</b><span>●●●●○</span></div></div></div></div></div><div class="page"><div class="mag pick"><span class="tag">PICK UP 2</span><div class="product-visual">🧴</div><div class="prod-title">香りのハンドクリーム</div><div class="price price-field">¥2,860 <span class="mini">くらい</span></div><div class="edit-note">実用品だけど、香りでちょっと特別。</div><div class="radar-wrap"><div class="radar"><svg viewBox="0 0 120 120"><polygon points="60,13 105,45 88,99 32,99 15,45" fill="none" stroke="#d7cbc5"/><polygon points="60,22 94,49 82,88 39,92 23,47" fill="rgba(238,107,121,.24)" stroke="#382f36" stroke-width="2"/></svg></div><div class="axes"><div class="axis-line"><b>その人らしさ</b><span>●●●●○</span></div><div class="axis-line"><b>あなたから贈る意味</b><span>●●●●●</span></div><div class="axis-line"><b>使いやすさ</b><span>●●●○○</span></div><div class="axis-line"><b>意外性</b><span>●●●●○</span></div><div class="axis-line"><b>特別感</b><span>●●●●○</span></div></div></div></div></div><div class="page"><div class="mag pick"><span class="tag">PICK UP 3</span><div class="product-visual">☕</div><div class="prod-title">ガラスのティーカップ</div><div class="price price-field">¥4,200 <span class="mini">くらい</span></div><div class="edit-note">いつもの飲み物が少し特別になる。</div><div class="radar-wrap"><div class="radar"><svg viewBox="0 0 120 120"><polygon points="60,13 105,45 88,99 32,99 15,45" fill="none" stroke="#d7cbc5"/><polygon points="60,22 94,49 82,88 39,92 23,47" fill="rgba(238,107,121,.24)" stroke="#382f36" stroke-width="2"/></svg></div><div class="axes"><div class="axis-line"><b>その人らしさ</b><span>●●●●○</span></div><div class="axis-line"><b>あなたから贈る意味</b><span>●●●●●</span></div><div class="axis-line"><b>使いやすさ</b><span>●●●○○</span></div><div class="axis-line"><b>意外性</b><span>●●●●○</span></div><div class="axis-line"><b>特別感</b><span>●●●●○</span></div></div></div></div></div><div class="page"><div class="mag pick"><span class="tag">PICK UP 4</span><div class="product-visual">📷</div><div class="prod-title">ミニ写真アルバム</div><div class="price price-field">¥2,500 <span class="mini">くらい</span></div><div class="edit-note">ふたりの思い出を足せる余白がある。</div><div class="radar-wrap"><div class="radar"><svg viewBox="0 0 120 120"><polygon points="60,13 105,45 88,99 32,99 15,45" fill="none" stroke="#d7cbc5"/><polygon points="60,22 94,49 82,88 39,92 23,47" fill="rgba(238,107,121,.24)" stroke="#382f36" stroke-width="2"/></svg></div><div class="axes"><div class="axis-line"><b>その人らしさ</b><span>●●●●○</span></div><div class="axis-line"><b>あなたから贈る意味</b><span>●●●●●</span></div><div class="axis-line"><b>使いやすさ</b><span>●●●○○</span></div><div class="axis-line"><b>意外性</b><span>●●●●○</span></div><div class="axis-line"><b>特別感</b><span>●●●●○</span></div></div></div></div></div></div>
+    <div id="pageCount" class="page-count">1 / 15</div>
+    <div class="catalog-actions"><button class="btn pink" onclick="openCheat('catalog')">👀 ここでカンニング</button><button class="btn primary" onclick="go('wrap')">🎁 このカタログを贈る</button></div>
+  </section>
+
+  <section id="wrap" class="screen">
+    <div class="topbar"><div><div class="logo">WRAPPING ROOM 🎀</div><div class="mini">AIがつくった3案（prototype）</div></div><button class="btn soft" style="padding:8px 10px" onclick="go('catalog')">←戻る</button></div>
+    <div class="hero" style="padding-bottom:4px"><span class="sticker">最後の仕上げ</span><h1 style="font-size:25px">カタログを包もう。</h1><p>中身だけじゃなく、渡す瞬間までプレゼントに。</p></div>
+    <div id="wrapGrid" class="wrap-grid">
+      <div class="wrap-option selected" onclick="selectWrap(this,1)"><div class="bag"><div class="ribbon"></div>♡</div><div><b>01 いちごミルク</b><p class="mini">プロフィールの柔らかい雰囲気から。丸シールと赤いリボン。</p></div></div>
+      <div class="wrap-option" onclick="selectWrap(this,2)"><div class="bag"><div class="ribbon"></div>✿</div><div><b>02 ミントノート</b><p class="mini">少し大人っぽい文具感。手書きタグ付き。</p></div></div>
+      <div class="wrap-option" onclick="selectWrap(this,3)"><div class="bag"><div class="ribbon"></div>★</div><div><b>03 レトロポップ</b><p class="mini">雑誌の付録みたいな、ちょっと賑やかな包み。</p></div></div>
+    </div>
+    <div style="padding:10px 16px calc(14px + env(safe-area-inset-bottom));margin-top:auto"><a class="btn primary" style="width:100%;display:block;text-decoration:none" href="#receiver">この包みでカタログギフトを見る →</a></div>
+  </section>
+
+  <section id="receiver" class="screen">
+    <div class="topbar"><div><div class="logo">A GIFT FOR YOU ♡</div><div class="mini">価格は表示されません</div></div><a class="btn soft" style="padding:8px 10px;text-decoration:none" href="#wrap">←</a></div>
+    <div class="hero"><span class="sticker">from your friend</span><h1 style="font-size:28px">あなたのために<br>15個えらびました。</h1><p>この中から「これ好き！」をひとつ選んでね。買う係は、贈り主です。</p></div>
+    <div class="receiver-card"><b>価格を隠したカタログ表示</b><p class="mini">このプロトタイプでは、受け取る側には価格を見せず、レーダーチャートと「なぜ選ばれたか」を残します。</p><a class="btn pink" style="width:100%;margin-top:8px;display:block;text-decoration:none" href="#catalog">カタログをめくる →</a></div>
+  </section>
+
+  <div id="notesOverlay" class="overlay" onclick="closeNotes(event)"><div class="lifted-note" id="liftedNote" onclick="event.stopPropagation()"><div class="corner-tape"></div><div class="note-num" id="noteNum"></div><div class="hand" id="noteText"></div><div class="swipe-hint">← スワイプ / タップで次のメモ →<br>下に払う気持ちで背景をタップすると戻れます</div></div></div>
+  <div id="cheatOverlay" class="overlay"><div class="modal-card"><span class="sticker">CHEAT MODE 👀</span><h2 id="cheatTitle">ついに押しましたね…</h2><p id="cheatBody"></p><div class="choices"><button class="btn primary" onclick="simulateCheat()">LINEでリンクを送ったことにする</button><button class="btn soft" onclick="closeOverlay('cheatOverlay')">やっぱり自力でがんばる</button></div></div></div>
+  <div id="readyOverlay" class="overlay"><div class="modal-card"><span class="sticker">材料が集まりました！</span><h2>そろそろ見つけられそうです。</h2><p>今まで話した内容と、プロフィールの修正を材料にして、15個の候補を探しに行けそう。</p><div class="choices"><a class="btn primary" href="#catalog" style="display:block;text-decoration:none">いいよ、探してきて！</a><button class="btn soft" onclick="closeOverlay('readyOverlay')">まだ話したいことがある</button></div></div></div>
+  <div id="toast" class="toast"></div>
+</div>
+<script>
+const qs=s=>document.querySelector(s), qsa=s=>[...document.querySelectorAll(s)];
+let person='みさき', turn=0, notes=[], profile={}, noteIndex=0, cheatContext='profile', readyShown=false, chosenWrap=1, receiverMode=false;
+const questions=[
+  'まず、'+ 'その人ってどんな人？思いつくままでいいよ。',
+  '最近、その人が「これ好きそうだな」って感じた瞬間ある？',
+  'よく使ってるものとか、いつも持ってるものって思い出せる？',
+  '逆に、もらっても困りそうなものはある？',
+  'その人とあなたの間で、「これ覚えてたら嬉しいだろうな」ってエピソードある？',
+  '最近の生活で、何か変わったことって聞いてる？引っ越し、仕事、学校、趣味とか。'
+];
+const profileKeys=['好き','最近','生活','避けたい','ふたりの話','その人らしさ'];
+const products=[
+ ['小さな花瓶','🌷','部屋に少しだけ色を足せる。自分では後回しにしがちなもの。',3980],
+ ['香りのハンドクリーム','🧴','実用品だけど、香りでちょっと特別。',2860],
+ ['ガラスのティーカップ','☕','いつもの飲み物が少し特別になる。',4200],
+ ['ミニ写真アルバム','📷','ふたりの思い出を足せる余白がある。',2500],
+ ['刺繍ハンカチ','🧵','日常で使えて、選んだ感も残しやすい。',1980],
+ ['ルームミスト','🫧','部屋の雰囲気を変える小さな贅沢。',3300],
+ ['焼き菓子ボックス','🍪','消えものだから気軽。でも選び方で個性が出る。',3600],
+ ['ブックライト','💡','夜の時間に寄り添う、ちょっと実用寄り。',3100],
+ ['カラフルな靴下','🧦','自分では選ばない色を贈る楽しさ。',2200],
+ ['小さなポーチ','👝','毎日使えて、色や柄でその人らしさを出せる。',3900],
+ ['入浴剤セット','🛁','忙しい時期なら“休んでね”を重くなく伝えられる。',2800],
+ ['デスクトレー','🗂️','生活にすっと入る整理アイテム。',4400],
+ ['小さなアートプリント','🖼️','実用性は低いけど、その人の部屋を想像して選べる。',3200],
+ ['お茶の飲み比べ','🍵','好みを探りつつ楽しめる消えもの。',3500],
+ ['キーホルダー','🔑','小さいけど、モチーフ選びに関係性が出る。',1800]
+];
+function go(id){qsa('.screen').forEach(x=>x.classList.remove('active'));qs('#'+id).classList.add('active')}
+function beginInterview(){person=qs('#personName').value.trim()||'あの人';qs('#interviewFor').textContent=person+'さんについて取材中';qs('#profileTitle').textContent=person+' PROFILE';qs('#catalogName').textContent=person.toUpperCase();go('interview');renderProfile();addBubble('ai',questions[0]);}
+function addBubble(who,text){const d=document.createElement('div');d.className='bubble '+who;d.textContent=text;qs('#messages').appendChild(d);qs('#messages').scrollTop=qs('#messages').scrollHeight}
+function sendChat(){const i=qs('#chatInput');const text=i.value.trim();if(!text)return;i.value='';addBubble('me',text);createNote(text);updateProfile(text);turn++;setTimeout(()=>{if(turn<questions.length)addBubble('ai',questions[turn]);else addBubble('ai','うん、かなりその人の輪郭が見えてきた。ほかにも思い出したことがあれば何でも話して。');},260);if(notes.length>=5&&!readyShown){readyShown=true;setTimeout(()=>qs('#readyOverlay').classList.add('show'),650)}}
+function createNote(text){let summary=text.length>44?text.slice(0,42)+'…':text;notes.push('・'+summary+'\n\n→ プレゼント探しの手がかりとして保存。');renderStack()}
+function renderStack(){const s=qs('#paperStack');[...s.querySelectorAll('.paper')].forEach(x=>x.remove());const n=Math.min(notes.length,8);for(let i=0;i<n;i++){const p=document.createElement('div');p.className='paper';p.style.transform=`translate(${(i%3-1)*2}px, ${-i*4}px) rotate(${(i%2?1:-1)*(i+1)*.7}deg)`;p.style.zIndex=i;s.prepend(p)}qs('#stackCount').textContent=notes.length}
+function updateProfile(text){const k=profileKeys[Math.min(turn,profileKeys.length-1)];profile[k]=text.length>25?text.slice(0,24)+'…':text;renderProfile(k)}
+function renderProfile(newKey){const g=qs('#profileGrid');g.innerHTML='';profileKeys.forEach((k,idx)=>{if(idx>Math.max(1,turn+1) && !profile[k]) return; const c=document.createElement('div');c.className='profile-cell'+(k===newKey?' new':'');c.innerHTML=`<b>${k}</b>${profile[k]||'<span style="opacity:.35">まだ空欄</span>'}`;g.appendChild(c)})}
+function openNotes(){if(!notes.length){toast('まだメモはありません');return}noteIndex=Math.min(noteIndex,notes.length-1);showNote();qs('#notesOverlay').classList.add('show')}
+function showNote(){qs('#noteNum').textContent=`AI HANDWRITTEN NOTE  ${noteIndex+1} / ${notes.length}`;qs('#noteText').textContent=notes[noteIndex]}
+qs('#liftedNote').addEventListener('click',()=>{if(notes.length){noteIndex=(noteIndex+1)%notes.length;showNote()}})
+function closeNotes(e){qs('#notesOverlay').classList.remove('show')}
+function openCheat(ctx){cheatContext=ctx;qs('#cheatTitle').textContent='……ついに押しましたね 👀';qs('#cheatBody').textContent=ctx==='profile'?`${person}さんに、AIがこっそりヒアリングしに行くリンクを送ります。回答はそのまま見せず、“ほどよくぼかしたヒント”だけこちらに戻します。`:`今ある候補を見たうえで、${person}さんに追加ヒアリング。商品名を聞くのではなく、方向性だけ少しカンニングします。`;qs('#cheatOverlay').classList.add('show')}
+function simulateCheat(){closeOverlay('cheatOverlay');setTimeout(()=>{toast('本人からヒントが届きました 👀');if(cheatContext==='profile'){const hint='本人ヒント：最近は「部屋で気軽に使えるもの」が少し気になるらしい（かなりぼかし済み）';notes.push('👀 '+hint);profile['本人ヒント']='部屋で気軽に使えるもの？';renderStack();renderProfile('本人ヒント');addBubble('ai',hint+'。このくらいなら、まだちゃんと自分で選べそう。')}else{addBubbleCatalogHint()}},300)}
+function addBubbleCatalogHint(){toast('「消えものじゃなくてもOK」くらいのヒントでした')}
+function closeOverlay(id){qs('#'+id).classList.remove('show')}
+function finishInterview(force){buildCatalog();go('catalog');setTimeout(()=>toast(force?'早めに切り上げてカタログを作りました':'15個、編集してきました！'),300)}
+function axesFor(i){const common=['その人らしさ','あなたから贈る意味'];const extras=[['日常で使える','意外性','自分では買わなそう'],['気軽さ','今の生活に合う','特別感'],['長く残る','使う場面が浮かぶ','好みとの一致'],['思い出との近さ','遊び心','負担の少なさ']][i%4];return [...common,...extras]}
+function valsFor(i,n){return Array.from({length:n},(_,j)=>2+((i*3+j*2)%4))}
+function radarSVG(labels,vals){const N=labels.length,c=60,r=47;let pts=[];for(let i=0;i<N;i++){const a=-Math.PI/2+2*Math.PI*i/N;pts.push([c+Math.cos(a)*r*vals[i]/5,c+Math.sin(a)*r*vals[i]/5])}let rings='';for(let lv=1;lv<=5;lv++){let rp=[];for(let i=0;i<N;i++){const a=-Math.PI/2+2*Math.PI*i/N;rp.push(`${c+Math.cos(a)*r*lv/5},${c+Math.sin(a)*r*lv/5}`)}rings+=`<polygon points="${rp.join(' ')}" fill="none" stroke="#d7cbc5" stroke-width=".7"/>`}let spokes='';for(let i=0;i<N;i++){const a=-Math.PI/2+2*Math.PI*i/N;spokes+=`<line x1="${c}" y1="${c}" x2="${c+Math.cos(a)*r}" y2="${c+Math.sin(a)*r}" stroke="#ddd0c9" stroke-width=".7"/>`}return `<svg viewBox="0 0 120 120">${rings}${spokes}<polygon points="${pts.map(p=>p.join(',')).join(' ')}" fill="rgba(238,107,121,.24)" stroke="#382f36" stroke-width="2"/><circle cx="60" cy="60" r="2" fill="#382f36"/></svg>`}
+function buildCatalog(){const t=qs('#catalogTrack');t.innerHTML='';products.forEach((p,i)=>{const labels=axesFor(i),vals=valsFor(i,labels.length);const page=document.createElement('div');page.className='page';page.innerHTML=`<div class="mag ${i<4?'pick':''}">${i<4?'<span class="tag">PICK UP '+(i+1)+'</span>':'<span class="sticker">OTHER FIND</span>'}<div class="product-visual">${p[1]}</div><div class="prod-title">${p[0]}</div><div class="price price-field">¥${p[3].toLocaleString()} <span class="mini">くらい</span></div><div class="edit-note">${p[2]}</div><div class="radar-wrap"><div class="radar">${radarSVG(labels,vals)}</div><div class="axes">${labels.map((l,j)=>`<div class="axis-line"><b>${l}</b><span class="dots">${'●'.repeat(vals[j])}${'○'.repeat(5-vals[j])}</span></div>`).join('')}</div></div></div>`;t.appendChild(page)});t.onscroll=()=>{const idx=Math.round(t.scrollLeft/t.clientWidth)+1;qs('#pageCount').textContent=`${idx} / ${products.length}`}}
+function selectWrap(el,n){qsa('.wrap-option').forEach(x=>x.classList.remove('selected'));el.classList.add('selected');chosenWrap=n;toast('この包みにしました 🎀')}
+function openReceiver(){go('receiver')}
+function openReceiverCatalog(){receiverMode=true;go('catalog');qsa('.price-field').forEach(x=>x.style.display='none');qs('.catalog-actions').innerHTML='<button class="btn soft" onclick="go(\'receiver\')">← 表紙に戻る</button><button class="btn primary" onclick="toast(\'「これが好き！」を贈り主に送りました ♡\')">♡ これが好き！</button>';toast('受け取る側：価格は非表示です')}
+function toast(msg){const t=qs('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._tm);t._tm=setTimeout(()=>t.classList.remove('show'),2200)}
+
+const startInterviewBtn=qs('#startInterviewBtn');
+if(startInterviewBtn){
+  const startHandler=(e)=>{e.preventDefault();beginInterview();};
+  startInterviewBtn.addEventListener('click',startHandler,{passive:false});
+  startInterviewBtn.addEventListener('touchend',startHandler,{passive:false});
+}
+</script>
+</body>
+</html>
+
